@@ -1,0 +1,33 @@
+{
+	"mappings" : [
+		{
+		  "source" : {
+			"name" : "LONGITUDE",
+			"type" : "FLOAT"
+		  },
+		  "target" : {
+			"name" : "LONGITUDE_NEW",
+			"type" : "VARCHAR"
+		  }
+		},
+		{
+		  "source" : {
+			"name" : "LATITUDE",
+			"type" : "FLOAT"
+		  },
+		  "target" : {
+			"name" : "LATITUDE_NEW"
+		  }
+		},
+		{
+		  "source" : {
+			"name" : "HOUSING_MEDIAN_AGE",
+			"type" : "FLOAT"
+		  },
+		  "target" : {
+			"name" : "HOUSING_MEDIAN_AGE",
+			"type" : "VARCHAR"
+		  }
+		}
+  ]
+}
