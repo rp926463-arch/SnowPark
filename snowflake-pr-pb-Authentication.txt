@@ -1,0 +1,35 @@
+Configuring Key Pair Authentication To connect to Snowflake
+--https://docs.snowflake.com/en/user-guide/key-pair-auth.html
+
+Step 1: Generate the Private Key
+//Generate Unencrypted Private key file
+$openssl genrsa 2048 | openssl pkcs8 -topk8 -inform PEM -out pr_rsa_key_une.p8 -nocrypt
+
+//Generate encrypted Private key file
+$openssl genrsa 2048 | openssl pkcs8 -topk8 -v2 des3 -inform PEM -out pr_rsa_key.p8
+
+
+Step 2: Generate a Public Key
+//generate the public key by referencing the private key, 
+//The following command assumes the private key is encrypted and contained in the file named pr_rsa_key.p8
+$openssl rsa -in pr_rsa_key_une.p8 -pubout -out pb_rsa_key_une.pub
+$openssl rsa -in pr_rsa_key.p8 -pubout -out pb_rsa_key.pub
+
+
+Step 3: Store the Private and Public Keys Securely
+Note that the private key is stored using the PKCS#8 
+(Public Key Cryptography Standards) format and is encrypted using the passphrase you specified .
+However, the file should still be protected from unauthorized access using the file permission mechanism provided by your operating system. It is your responsibility to secure the file when it is not being used.
+
+Step 4: Assign the Public Key to a Snowflake User
+//Execute an ALTER USER command to assign the public key to a Snowflake user.
+alter user jsmith set rsa_public_key='MIIBIjANBgkqh...';
+
+
+Step 5: Verify the User’s Public Key Fingerprint
+desc user jsmith;
+
+
+
+
+
