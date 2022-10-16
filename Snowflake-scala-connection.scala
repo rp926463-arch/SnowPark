@@ -70,7 +70,7 @@ session.table("sample_product_data").show(2)
 
 // COMMAND ----------
 
-// DBTITLE 1,Spark Connector
+// DBTITLE 1,Spark Connector - Using Username & Password
 import org.apache.spark.sql._
 import net.snowflake.spark.snowflake.Utils
 import net.snowflake.spark.snowflake.Utils.SNOWFLAKE_SOURCE_NAME
@@ -120,6 +120,38 @@ df.write
 //Use the runQuery() method of the Utils object to execute DDL/DML SQL statements, in addition to queries, for example
 Utils.runQuery(sfOptions, "CREATE OR REPLACE TABLE MY_TABLE(A INTEGER)")
 
+
+// COMMAND ----------
+
+// DBTITLE 1,Spark Connector - Using Key Pair Authentication & Key Pair Rotation
+import org.apache.spark.sql._
+import net.snowflake.spark.snowflake.Utils
+import net.snowflake.spark.snowflake.Utils.SNOWFLAKE_SOURCE_NAME
+//
+// Configure your Snowflake environment
+//
+
+var pkb = dbutils.secrets.get(scope="dbr-secret-scope", key="snowflake-spark-pkb")
+
+var sfOptions = Map(
+    "sfURL" -> "bypgtvv-tw48419.snowflakecomputing.com",
+    "sfUser" -> user_name,
+    "pem_private_key" -> pkb,
+    "sfDatabase" -> "TEST_DB",
+    "sfSchema" -> "TEST_SCHEMA",
+    "sfWarehouse" -> "MY_WH"
+    )
+
+//
+// Create a DataFrame from a Snowflake table
+//
+val df: DataFrame = sqlContext.read
+    .format(SNOWFLAKE_SOURCE_NAME)
+    .options(sfOptions)
+    .option("dbtable", "MY_TABLE")
+    .load()
+
+df.show(2)
 
 // COMMAND ----------
 
