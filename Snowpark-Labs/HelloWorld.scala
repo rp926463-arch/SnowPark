@@ -75,8 +75,8 @@ object HelloWorld extends Logs{
     
     var sfOptions = Map(
       "url" -> "ljxubxq-bt83120.snowflakecomputing.com",
-      "user" -> "RP926463",
-      "password" -> "Xmb#529Geq",
+      "user" -> "***",
+      "password" -> "***",
       "role" -> "accountadmin",
       "warehouse" -> "COMPUTE_WH",
       "database" -> "SNOWFLAKE_SAMPLE_DATA",
