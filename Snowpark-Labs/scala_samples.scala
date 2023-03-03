@@ -299,3 +299,43 @@ like
 }
 ]
 }
+
+
+================
+import com.snowflake.snowpark._
+import com.snowflake.snowpark.functions._
+import com.snowflake.snowpark.types._
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
+
+val jsonStr = """
+{
+  "properties": [
+    {
+      "name": "col1",
+      "position": "1,2"
+    },
+    {
+      "name": "col2",
+      "position": "3,6"
+    }
+  ]
+}
+"""
+
+val json = parse(jsonStr)
+val properties = json \\ "properties"
+
+val df: DataFrame = Seq(
+  ("abcdef", "ghijkl"),
+  ("mnopqr", "stuvwx")
+).toDF("col1", "col2")
+
+val modifiedDf = df.select(properties.map { p =>
+  val name = (p \ "name").extract[String]
+  val Array(start, end) = (p \ "position").extract[String].split(",").map(_.toInt)
+  val col = df(name)
+  substring(col, start, end - start + 1).as(name)
+}: _*)
+
+modifiedDf.show()
