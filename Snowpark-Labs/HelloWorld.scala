@@ -49,7 +49,6 @@ trait Logs {
 
 import com.snowflake.snowpark._
 
-import shorty.Logs
 
 //Imported for adjusting the logging level. 
 
@@ -65,7 +64,7 @@ val customLogs = LoggerFactory.getLogger("CustomLogs-" + feedSourceCode + "-" + 
  * You can use this class to verify that you set the connection properties correctly in the
  * snowflake_connection.properties file that is used by this code to create a session.
  */
-object HelloWorld extends Logs{
+object HelloWorld {
   def main(args: Array[String]): Unit = {
     // By default, the library logs INFO level messages.
     // If you need to adjust the logging levels, uncomment the statement below, and change X to
@@ -75,8 +74,8 @@ object HelloWorld extends Logs{
     
     var sfOptions = Map(
       "url" -> "ljxubxq-bt83120.snowflakecomputing.com",
-      "user" -> "***",
-      "password" -> "***",
+      "user" -> "RP926463",
+      "password" -> "Xmb#529Geq",
       "role" -> "accountadmin",
       "warehouse" -> "COMPUTE_WH",
       "database" -> "SNOWFLAKE_SAMPLE_DATA",
@@ -103,6 +102,37 @@ object HelloWorld extends Logs{
 // COMMAND ----------
 
 HelloWorld.main(Array())
+
+// COMMAND ----------
+
+// MAGIC %python
+// MAGIC
+// MAGIC # dbutils.fs.rm("dbfs:/tmp/inti_script.sh")
+// MAGIC
+// MAGIC # code_txt = """
+// MAGIC # #!/bin/bash
+// MAGIC # echo "Executing on Driver: $DB_IS_DRIVER"
+// MAGIC # if [[ $DB_IS_DRIVER = "TRUE" ]]; then
+// MAGIC # LOG4J_PATH="/home/ubuntu/databricks/spark/dbconf/log4j/driver/log4j.properties"
+// MAGIC # else
+// MAGIC # LOG4J_PATH="/home/ubuntu/databricks/spark/dbconf/log4j/executor/log4j.properties"
+// MAGIC # fi
+// MAGIC # echo "Adjusting log4j.properties here: ${LOG4J_PATH}"
+// MAGIC # echo "log4j.rootCategory=INFO, file, stdout" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.file=com.databricks.logging.RedactionRollingFileAppender" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.file.File=dbfs:/tmp/logs/logging.log" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.file.layout=org.apache.log4j.PatternLayout" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.file.layout.ConversionPattern=%d{yy/MM/dd HH:mm:ss} %p %c{1}: %m%n" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.file.rollingPolicy=org.apache.log4j.rolling.TimeBasedRollingPolicy" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.file.rollingPolicy.FileNamePattern=logs/log4j-%d{yyyy-MM-dd-HH}.log.gz" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.file.rollingPolicy.ActiveFileName=logs/log4j-active.log" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.stdout=org.apache.log4j.ConsoleAppender" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.stdout.Target=System.out" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout" >> ${LOG4J_PATH}
+// MAGIC # echo "log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" >> ${LOG4J_PATH}
+// MAGIC # """
+// MAGIC
+// MAGIC # dbutils.fs.put("dbfs:/tmp/inti_script.sh",code_txt)
 
 // COMMAND ----------
 
