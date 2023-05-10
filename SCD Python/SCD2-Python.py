@@ -1,38 +1,8 @@
 # Databricks notebook source
-# CREATE OR REPLACE TABLE STAGING_STORES (store_id varchar(5), location varchar(100), value integer)
-# ;
-
-# CREATE TABLE FINAL_STORES (store_id varchar(5), location varchar(100), value integer, start_date date, end_date date, active_flag char)
-# ;
-
-# CREATE OR REPLACE FILE FORMAT CSV_FORMAT
-#     TYPE = CSV
-#     FIELD_DELIMITER = ','
-#     SKIP_HEADER = 1
-#     NULL_IF = ('NULL', 'NULL')
-#     EMPTY_FIELD_AS_NULL = TRUE
-#     COMPRESSION = GZIP
-# ;
-
-# CREATE STAGE CSV_STAGE
-#     DIRECTORY = (ENABLE = TRUE)
-#     FILE_FORMAT = CSV_FORMAT
-# ;
-
-# --put file://D:\Datasets\stores.csv @CSV_STAGE;
-
-# SELECT T.$1, T.$2, T.$3 FROM @CSV_STAGE (FILE_FORMAT => 'CSV_FORMAT') T;
-
-# INSERT INTO STAGING_STORES SELECT T.$1, T.$2, T.$3 FROM @CSV_STAGE (FILE_FORMAT => 'CSV_FORMAT') T;
-
-# SELECT * FROM STAGING_STORES;
-
-# COMMAND ----------
-
 sfConnection = {
     "sfURL" : "https://ryyplfk-fg21385.snowflakecomputing.com",
     "sfUser" : "ak926463",
-    "sfPassword" : "xmb#529Geq",
+    "sfPassword" : "****",
     "sfDatabase" : "TEST_DB",
     "sfSchema" : "TEST_SCHEMA",
     "sfRole" : "accountadmin",
@@ -267,6 +237,90 @@ class scdProcess:
 
                 print("\n dfSourceUpdates ;")
                 dfSourceUpdates.show()
+
+                # # Update records in source table
+                # dfSourceUpdates = dfSource.join(dfTargetActive, keyColumns, "inner") \
+                #     .filter((~(dfSource["HASH_ROW_VALUE"] == dfTargetActive["HASH_ROW_VALUE"])) \
+                #             & ((dfTargetActive[scdEndDateColumnName].isNull())
+                #             | (coalesce(dfTargetActive[scdEndDateColumnName], to_date(lit('1901-01-01'))) == coalesce(
+                #             to_date(lit(tmp_scdActiveDate)), to_date(lit('1901-01-01')))))) \
+                #     .select(dfSource.columns)
+
+                # # Insert new records in source table
+                # dfSourceInserts = dfSource.join(dfTargetActive, keyColumns, "anti")
+
+                # # Update records in target table
+                # dfTargetUpdates = dfTargetActive.join(dfSource, keyColumns, "inner") \
+                #     .filter((~(dfSource["HASH_ROW_VALUE"] == dfTargetActive["HASH_ROW_VALUE"])) \
+                #             & ((dfTargetActive[scdEndDateColumnName].isNull()) | (
+                #         coalesce(dfTargetActive[scdEndDateColumnName], to_date(lit('1901-01-01'))) == coalesce(
+                #     to_date(lit(tmp_scdActiveDate)), to_date(lit('1901-01-01'))))) \
+                #             & (~(coalesce(dfTargetActive[scdStartDateColumnName], to_date(lit('1901-01-01'))) == to_date(
+                #     lit(runControlDate))))) \
+                #     .select(dfTargetActive.columns)
+
+                # dfTargetUpdatesUnion = dfTargetEmpty.union(dfTargetUpdates) \
+                #     .select(targetColumnOrderArray) \
+                #     .withColumn(self.scdEndDateColumnName, date_add(to_date(lit(self.runControlDate)), -1)) \
+                #     .withColumn(self.scdActiveFlagColumnName, lit("N")) \
+                #     .select(targetColumnOrderArray)
+
+                # dfTargetDeletes = dfTargetEmpty.select(targetColumnOrderArray)
+
+                # # Delete records in target table for full refresh
+
+                # if self.refreshType == "full":
+                #     dfTargetDeletes = dfTarget.join(dfSource, self.keyColumns, "anti") \
+                #         .select(targetColumnOrderArray) \
+                #         .withColumn(scdEndDateColumnName, date_add(lit(self.runControlDate), -1)) \
+                #         .withColumn(self.scdActiveFlagColumnName, lit("N")) \
+                #         .select(targetColumnOrderArray)
+
+                # dfSourceInsertsUpdates = dfSourceInserts.union(dfSourceUpdates) \
+                #     .withColumn(self.scdStartDateColumnName, lit(self.runControlDate)) \
+                #     .withColumn(self.scdEndDateColumnName, lit(self.scdActiveEndDate)) \
+                #     .withColumn(self.scdActiveFlagColumnName, lit("Y")) \
+                #     .select(targetColumnOrderArray) \
+                #     .union(dfTargetUpdatesUnion) \
+                #     .union(dfTargetDeletes)
+
+                # mergeInsertDict = {}
+
+                # print("dfSourceInsertsUpdates Names :", dfSourceInsertsUpdates.columns)
+
+                # for c in dfSourceInsertsUpdates.schema.names:
+                #     mergeInsertDict[c] = dfSourceInsertsUpdates[c]
+
+                # print("mergeInsertDict : ", mergeInsertDict)
+
+                # merge_key_columns = self.construct_merge_key_columns(self.keyColumns)
+
+                # mergeUpdateDict = {k: v for k, v in mergeInsertDict.items() if
+                #                 k != self.scdStartDateColumnName and k not in self.keyColumns}
+                # print("mergeUpdateDict : ", mergeUpdateDict)
+
+                # target = self.targetTable
+
+                # merge_build_obj = target.merge(dfSourceInsertsUpdates,
+                #                             ((target[merge_key_columns[0]] == dfSourceInsertsUpdates[
+                #                                 merge_key_columns[0]])
+                #                                 & (target[merge_key_columns[1]] == dfSourceInsertsUpdates[
+                #                                         merge_key_columns[1]])
+                #                                 & (target[merge_key_columns[2]] == dfSourceInsertsUpdates[
+                #                                         merge_key_columns[2]])
+                #                                 & (target[merge_key_columns[3]] == dfSourceInsertsUpdates[
+                #                                         merge_key_columns[3]])
+                #                                 & (target[merge_key_columns[4]] == dfSourceInsertsUpdates[
+                #                                         merge_key_columns[4]])
+                #                                 & (coalesce(target[self.scdStartDateColumnName],
+                #                                             to_date(lit("1901-01-01"))) == coalesce(
+                #                                         dfSourceInsertsUpdates[self.scdStartDateColumnName],
+                #                                         to_date(lit("1901-01-01")))))) \
+                #     .whenMatched().update(mergeUpdateDict).whenNotMatched().insert(mergeInsertDict)
+
+                # merge_execute_result = merge_build_obj.collect()
+
+                # self.error_message = self.error_message + str(merge_execute_result) + " Control Date: " + runControlDate
 
             # except Exception as e:
             #     print(e)
