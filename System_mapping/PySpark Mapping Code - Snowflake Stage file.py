@@ -1,17 +1,15 @@
 # Databricks notebook source
-!pip install snowflake-snowpark-python==0.6.0
-
-# COMMAND ----------
-
-
 
 from snowflake.snowpark import Session
-from utils.apputils import AppUtils
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, when, expr, lit, current_date, current_timestamp
 from snowflake.snowpark.types import StructType, StructField, IntegerType, StringType, FloatType
 from functools import reduce
+import json
 
+def readJson(object):
+    with open(object, "r") as sf:
+        return json.load(sf)
 
 connection_parameters = {
   "account": "ryyplfk-fg21385",
@@ -22,8 +20,8 @@ connection_parameters = {
   "database": "TEST_DB",
   "schema": "STAGING"
 }
-scourcefile = "data/source_json.json"
-source_schema = AppUtils.readJson(scourcefile)
+scourcefile = "/dbfs/test/project/system_mapping/source_json.json"
+source_schema = readJson(scourcefile)
 
 # schema = StructType(reduce(
 #             lambda acc, x: acc + [StructField(x["name"], StringType(), True)], source_schema["properties"],[]
