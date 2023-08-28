@@ -7,25 +7,70 @@
 		  },
 		  "target" : {
 			"name" : "LONGITUDE_NEW",
+			"type" : "DOUBLE"
+		  }
+		},
+		{
+		  "source" : {
+			"name" : "Country",
+			"type" : "VARHCAR"
+		  },
+		  "target" : {
+			"name" : "Country",
+			"type" : "VARCHAR(5)"
+		  }
+		},
+		{
+		  "source" : {
+			"name" : "SOURCE_DATE",
 			"type" : "VARCHAR"
+		  },
+		  "target" : {
+			"name" : "TARGET_DATE",
+			"type" : "DATE",
+			"expression" : "TO_DATE(SOURCE_DATE,'dd.mm.yyyy')"
 		  }
 		},
 		{
 		  "source" : {
-			"name" : "LATITUDE",
-			"type" : "FLOAT"
+			"name" : "LONGITUDE",
+			"type" : "VARCHAR"
 		  },
 		  "target" : {
-			"name" : "LATITUDE_NEW"
+			"name" : "TARGET_EXP",
+			"type" : "VARCHAR",
+			"expression" : " LONGITUDE ||','|| Country "
 		  }
 		},
 		{
 		  "source" : {
-			"name" : "HOUSING_MEDIAN_AGE",
-			"type" : "FLOAT"
+			"name" : "SOURCE_TIMESTAMP",
+			"type" : "VARCHAR"
 		  },
 		  "target" : {
-			"name" : "HOUSING_MEDIAN_AGE",
+			"name" : "TARGET_TIMESTAMP",
+			"type" : "TIMESTAMP",
+			"expression" : "to_timestamp(SOURCE_TIMESTAMP, 'yyyy-MM-dd HH:mm:ss')"
+		  }
+		},
+		{
+		  "source" : {
+			"name" : "Country",
+			"type" : "VARCHAR"
+		  },
+		  "target" : {
+			"name" : "COUNTRY_FLAG",
+			"type" : "VARCHAR",
+			"expression" : "substring(Country, 1, 3)"
+		  }
+		},
+		{
+		  "source" : {
+			"name" : "I'm Constant",
+			"type" : "constant"
+		  },
+		  "target" : {
+			"name" : "STATIC_VALUE",
 			"type" : "VARCHAR"
 		  }
 		}
